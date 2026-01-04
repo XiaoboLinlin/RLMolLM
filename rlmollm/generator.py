@@ -228,6 +228,12 @@ class RLMolLMGenerator:
         args.data_file = initial_population_file
         args.seed = self.seed
         
+        # Override saved_generator path in config with checkpoint_path
+        # This ensures we use the correct checkpoint file
+        for operator in self.config.get('gan_operators', []):
+            if 'saved_generator' in operator or self.checkpoint_path:
+                operator['saved_generator'] = self.checkpoint_path
+        
         # Initialize GAN operators
         gan_operators = initialize_gan_operators(
             self.config, 
