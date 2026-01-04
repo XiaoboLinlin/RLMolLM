@@ -1,6 +1,6 @@
 #!/bin/bash
-# RLMolLM Installation Script for DNS-Restricted Environments
-# This script installs RLMolLM using pip only (no conda repos)
+# RLMolLM Installation Script (pip-based)
+# This script installs RLMolLM using pip only
 
 set -e  # Exit on error
 
