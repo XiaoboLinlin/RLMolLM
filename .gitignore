@@ -74,6 +74,7 @@ check_validity.py
 cmd_example*.txt
 *.md
 !README.md
+!assets/README.md
 
 # ==============================================================================
 # Docker-related files (API deployment, not core library)
