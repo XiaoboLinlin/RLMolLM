@@ -26,9 +26,9 @@ conda activate rlmollm-env
 pip install -e .
 ```
 
-### Alternative: Pip-only (For DNS-restricted environments)
+### Alternative: Pip-only Installation
 
-If conda repository access is blocked:
+If you prefer not to use conda or don't have it installed:
 
 ```bash
 git clone https://github.com/XiaoboLinlin/RLMolLM.git
