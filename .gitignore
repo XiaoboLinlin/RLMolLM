@@ -19,6 +19,7 @@ inference_output/
 inference_output_*
 test_output/
 test_output*/
+test_output_pytest/
 test_scaffold_check/
 test_scaffold_check_*/
 latex/
