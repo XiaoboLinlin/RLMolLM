@@ -10,7 +10,7 @@
 # ==============================================================================
 model_weights/
 model_weights*
-models/  # Downloaded models (use assets/models/ instead)
+models/
 play_try/
 datasets/
 training_output/
@@ -25,18 +25,18 @@ latex/
 inference/
 api/
 .vscode/
-analysis/  # Analysis scripts and plots (not part of library)
+analysis/
 manuscript_analysis/
 results/
 moved_folder/
 zarchive/
-download_script/   # Old download script with hardcoded token - DO NOT COMMIT
-initial_populations/  # Old location - moved to assets/initial_populations/
+download_script/
+initial_populations/
 examples/
-data/              # Not needed - RDKit has SA scoring built-in
+data/
 docs/
-config/  # Old configs - replaced by assets/configs/ and rlmollm/scoring/property_configs.py
-.cache/            # Hugging Face cache (downloaded models)
+config/
+.cache/
 
 # Assets folder - track structure but exclude large files
 assets/models/*.pt          # Exclude model weights (too large for git)
