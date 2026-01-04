@@ -55,6 +55,7 @@ tests/*.md
 # ==============================================================================
 # Shell scripts for old training workflow
 *.sh
+!install_pip_only.sh
 
 # Old training/inference scripts (replaced by library API)
 training_combined.py
