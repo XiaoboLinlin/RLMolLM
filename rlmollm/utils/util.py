@@ -214,14 +214,17 @@ def initialize_gan_operators(config, device, mutation_parameter_list, args):
             # Check if there's a saved_generator (pretrained weights)
             if config_copy.get('saved_generator'):
                 print(f"model_directory '{model_dir}' not found locally")
-                print("Using tokenizer directory for model structure...")
+                print("Using tokenizer directory for model structure with saved weights...")
                 config_copy['model_directory'] = 'tokenizer'
+                # Use random_init=True to create model from config, then load saved weights
+                args.random_init = True
         elif model_dir.endswith('.pt') and os.path.exists(model_dir):
             # Legacy case: model_directory points directly to a .pt file
             print(f"Detected .pt file in model_directory: {model_dir}")
             print("Using tokenizer directory with saved generator weights...")
             config_copy['model_directory'] = 'tokenizer'
             config_copy['saved_generator'] = model_dir
+            args.random_init = True
             
         gan_operators.append(
             Gan(**config_copy,
