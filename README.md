@@ -12,39 +12,35 @@ A Python library for AI-driven molecular generation and optimization using reinf
 
 ## Installation
 
-### 1. Setup Environment
+### Recommended: Using Conda
 
 ```bash
-# Create Python 3.11 environment
-conda create -n rlmollm-env python=3.11.11
+git clone https://github.com/XiaoboLinlin/RLMolLM.git
+cd RLMolLM
+
+# Create Python 3.11+ environment
+conda create -n rlmollm-env python=3.11
 conda activate rlmollm-env
 
-# Install package in editable mode
-cd rlmollm
+# Install package
 pip install -e .
-
-# Or install with optional dependencies
-pip install -e ".[test]"      # Include testing tools
-pip install -e ".[api]"        # Include API server
-pip install -e ".[all]"        # Include everything
 ```
 
-### 2. Download Pre-trained Models and Data
+### Alternative: Pip-only (For DNS-restricted environments)
 
-Model weights (~417MB) and initial populations (~3.6MB) are required but not included in the repository.
-
-Download them automatically:
+If conda repository access is blocked:
 
 ```bash
-python download_assets.py
+git clone https://github.com/XiaoboLinlin/RLMolLM.git
+cd RLMolLM
+bash install_pip_only.sh
+source rlmollm_env/bin/activate
 ```
 
-The script downloads from our public Hugging Face repository and organizes files in `assets/`:
-- `assets/models/` - Pre-trained model weights
-- `assets/initial_populations/` - Initial molecular populations
-- `assets/configs/` - Configuration files (already in git)
+### Download Pre-trained Models
 
-Or download specific datasets only:
+Model weights (~417MB) and initial populations are required:
+
 ```bash
 python download_assets.py --dataset moses
 ```
@@ -230,41 +226,13 @@ pytest tests/test_admet_opt.py -v
 pytest tests/test_scaffold.py -v
 ```
 
-## Project Structure
-
-```
-rlmollm/
-├── rlmollm/                   # Main package
-│   ├── generator.py           # Main API class
-│   ├── models/                # Neural network architectures
-│   ├── population/            # Population management
-│   ├── scoring/               # Property calculation
-│   │   ├── molecule_scoring.py
-│   │   ├── admet_scoring.py
-│   │   └── property_configs.py  # All property configurations
-│   ├── scaffold/              # Scaffold handling
-│   └── utils/                 # Utilities
-├── tests/                     # Test suite
-│   ├── conftest.py
-│   ├── test_multi_property.py
-│   ├── test_admet_opt.py
-│   └── test_scaffold.py
-├── config/                    # Configuration files
-│   ├── no_scaffold_2_moses.json
-│   ├── no_scaffold_2_zinc.json
-│   └── scaffold_examples/
-├── setup.py                   # Package installation
-└── requirements.txt           # Dependencies
-```
-
 ## Requirements
 
-- Python 3.11.11
-- PyTorch 2.4.0
-- Transformers 4.50.0
-- RDKit 2024.3.3
-- ADMET-AI 1.3.1
-- pandas, numpy, tqdm
+- Python 3.11+
+- PyTorch 2.4.0+
+- Transformers 4.50.0+
+- RDKit 2024.3.3+
+- ADMET-AI 1.3.1+
 
 Full list in `requirements.txt`.
 
