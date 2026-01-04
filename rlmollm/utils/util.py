@@ -212,8 +212,8 @@ def initialize_gan_operators(config, device, mutation_parameter_list, args):
             print(f"Detected .pt file in model_directory: {model_dir}")
             print("Using base model with saved generator weights...")
             
-            # Use base model directory for model structure
-            config_copy['model_directory'] = 'model_weights'
+            # Use tokenizer directory for model structure (has config.json)
+            config_copy['model_directory'] = 'tokenizer'
             # Set the .pt file as saved_generator
             config_copy['saved_generator'] = model_dir
             
