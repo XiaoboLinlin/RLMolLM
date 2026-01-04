@@ -10,7 +10,7 @@
 # ==============================================================================
 model_weights/
 model_weights*
-models/
+/models/
 play_try/
 datasets/
 training_output/
@@ -64,7 +64,6 @@ run_*.py
 build_*.py
 regenerate_*.py
 smiles_to_chars.py
-token_splits.py
 test_initial_population_feature.py
 setup.py
 

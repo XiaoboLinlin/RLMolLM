@@ -8,7 +8,7 @@ import time
 from tqdm import tqdm
 import transformers
 import json
-from token_splits import pretokenizer_dict
+from rlmollm.token_splits import pretokenizer_dict
 import rdkit.Chem as Chem
 import random
 import itertools
