@@ -1,0 +1,10 @@
+# Initial Populations Directory
+
+Place initial population CSV files here:
+- `moses_2000.csv`
+- `zinc_2000.csv`
+- `guacamol_2000.csv`
+- `gdb_2000.csv`
+
+Download using: `python download_assets.py`
+

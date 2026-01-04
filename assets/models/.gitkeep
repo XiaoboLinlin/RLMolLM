@@ -1,0 +1,10 @@
+# Models Directory
+
+Place pre-trained model files here:
+- `moses_pretrained.pt`
+- `zinc_pretrained.pt`
+- `guacamol_pretrained.pt`
+- `gdb_pretrained.pt`
+
+Download using: `python download_assets.py`
+

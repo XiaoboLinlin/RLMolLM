@@ -1,271 +1,298 @@
-# RLMolLM: Reinforcement Learning-Enhanced Language Model Framework for Inverse Molecular Design
+# RLMolLM: RL-Enhanced Language Model for Molecular Design
 
-This repository contains code for training and evaluating molecular generation models using reinforcement learning approaches. The framework supports both scaffold-based and non-scaffold molecular generation with various training configurations.
+A Python library for AI-driven molecular generation and optimization using reinforcement learning. Generate drug-like molecules optimized for multiple properties simultaneously.
 
-## Table of Contents
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Workflow Overview](#workflow-overview)
-- [Step 1: Generate Initial Population](#step-1-generate-initial-population)
-- [Step 2: Training](#step-2-training)
-- [Step 3: Inference](#step-3-inference)
-- [Step 4: Analysis](#step-4-analysis)
-- [Configuration](#configuration)
-- [Output Structure](#output-structure)
+## Features
+
+- 🎯 **Multi-property optimization** - Optimize QED, LogP, SA, and 49+ ADMET properties
+- 🔬 **Scaffold-based generation** - Constrain molecules to specific scaffolds
+- 🚀 **Simple API** - Just import and use, no scripts needed
+- 📊 **Built-in analysis** - Returns DataFrames with all calculated properties
+- 🧪 **Well-tested** - Comprehensive test suite included
 
 ## Installation
 
-### 1. Create Conda Environment
+### 1. Setup Environment
 
 ```bash
-# Create the Python 3.11 environment
+# Create Python 3.11 environment
 conda create -n rlmollm-env python=3.11.11
 conda activate rlmollm-env
+
+# Install package in editable mode
+cd rlmollm
+pip install -e .
+
+# Or install with optional dependencies
+pip install -e ".[test]"      # Include testing tools
+pip install -e ".[api]"        # Include API server
+pip install -e ".[all]"        # Include everything
 ```
 
-### 2. Install Dependencies
+### 2. Download Pre-trained Models and Data
+
+Model weights (~417MB) and initial populations (~3.6MB) are required but not included in the repository.
+
+Download them automatically:
 
 ```bash
-# Install the requirements
-pip install -r requirements.txt
+python download_assets.py
 ```
 
-### 3. Download Required Model Files
+The script downloads from our public Hugging Face repository and organizes files in `assets/`:
+- `assets/models/` - Pre-trained model weights
+- `assets/initial_populations/` - Initial molecular populations
+- `assets/configs/` - Configuration files (already in git)
 
-Due to file size limitations, some large files are hosted separately:
-
-**Model Weights (209MB):**
-The pre-trained model weights are hosted on a private Hugging Face repository and can be downloaded automatically using our download script.
-
-**🚀 Easy Download:**
+Or download specific datasets only:
 ```bash
-# Run the download script - it handles everything automatically!
-python download_script/download_model_weights.py
+python download_assets.py --dataset moses
 ```
 
-**What the script does:**
-- ✅ Automatically installs `huggingface_hub` if needed
-- ✅ Creates `model_weights/` directory if it doesn't exist  
-- ✅ Downloads `pytorch_model.bin` (208MB) and `config.json` (565B)
-- ✅ Verifies file integrity and sizes
-- ✅ Skips files that already exist
+## Quick Start
 
-**Manual Details:**
-- **Repository**: `scofieldlinlin/rlmollm-models` (Private)
-- **Access Token**: Embedded in download script
+### Basic Usage
 
-**Note**: This project requires Python 3.11.11 and specific package versions as listed in `requirements.txt`. The main dependencies include:
-- PyTorch 2.4.0
-- Transformers 4.50.0
-- RDKit 2024.3.3
-- ADMET-AI 1.3.1 (ADMET features in development)
-- UMAP-learn 0.5.7
+```python
+from rlmollm import RLMolLMGenerator, get_model_path, get_config_path, get_population_path
+
+# Initialize generator (using convenience functions for paths)
+generator = RLMolLMGenerator(
+    checkpoint_path=get_model_path("moses"),
+    config_path=get_config_path("moses")
+)
+
+# Optimize molecules for drug-likeness
+molecules_df = generator.optimize(
+    target_properties={'qed': 1.0},  # Maximize QED
+    initial_population_file=get_population_path("moses"),
+    population_size=200,
+    generations=5,
+    output_dir="output/my_optimization",
+    return_dataframe=True
+)
+
+# Results are in a DataFrame
+print(molecules_df[['smiles', 'qed', 'fitness']].head())
+```
+
+**Alternative: Use custom paths**
+
+```python
+# You can still provide custom paths
+generator = RLMolLMGenerator(
+    checkpoint_path="path/to/your/model.pt",
+    config_path="path/to/your/config.json"
+)
+```
+
+### Multi-Property Optimization
+
+```python
+from rlmollm import RLMolLMGenerator, get_model_path, get_config_path, get_population_path
+
+generator = RLMolLMGenerator(
+    checkpoint_path=get_model_path("moses"),
+    config_path=get_config_path("moses")
+)
+
+# Optimize multiple properties simultaneously
+molecules_df = generator.optimize(
+    target_properties={
+        'qed': 1.0,        # Maximize drug-likeness
+        'logp': 2.5,       # Target LogP of 2.5
+        'sa': 1.0,         # Easier to synthesize (Synthetic Accessibility)
+    },
+    initial_population_file=get_population_path("moses"),
+    population_size=200,
+    generations=5,
+    output_dir="output/multi_property",
+    return_dataframe=True
+)
+```
+
+### Scaffold-Based Generation
+
+```python
+# Generate molecules constrained to a benzene scaffold
+# Use '#' markers to indicate attachment points
+molecules_df = generator.optimize(
+    target_properties={
+        'qed': 1.0,
+        'logp': 2.5,
+    },
+    use_scaffold=True,
+    scaffold_smiles="#c1cc(#)ccc1#",  # Benzene with 3 attachment points
+    population_size=100,
+    generations=5,
+    output_dir="output/benzene_scaffold",
+    return_dataframe=True
+)
+
+# All molecules will contain the benzene core
+```
+
+### ADMET Property Optimization
+
+Optimize for 49+ ADMET properties - they're automatically loaded even if not in your config!
+
+```python
+molecules_df = generator.optimize(
+    target_properties={
+        'qed': 1.0,
+        'PAMPA_NCATS': 1.0,         # Maximize permeability
+        'hERG': 0.0,                # Minimize cardiac toxicity
+        'Caco2_Wang': 1.0,          # Maximize Caco-2 permeability
+        'AMES': 0.0,                # Minimize mutagenicity
+    },
+    initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+    population_size=200,
+    generations=5,
+    output_dir="output/admet",
+    return_dataframe=True
+)
+
+# Both raw and normalized values are included
+print(molecules_df[['smiles', 'PAMPA_NCATS', 'PAMPA_NCATS_raw', 'hERG', 'hERG_raw']].head())
+```
+
+### Model Types
+
+Choose different training strategies:
+
+```python
+# Language Model with PPO reinforcement learning
+molecules_df = generator.optimize(
+    target_properties={'qed': 1.0},
+    model_type='lm_ppo',  # Options: 'lm', 'lm_ppo', 'alm', 'alm_ppo'
+    initial_population_file="...",
+    population_size=200,
+    generations=5,
+    output_dir="output/lm_ppo",
+    return_dataframe=True
+)
+```
+
+## Available Properties
+
+### Basic Properties
+- `qed` - Drug-likeness (Quantitative Estimate of Drug-likeness)
+- `logp` - Lipophilicity
+- `sa` - Synthetic Accessibility (1 = easy to synthesize, 10 = hard)
+- `tpsa` - Topological Polar Surface Area
+
+### ADMET Properties (49+ available)
+
+**Absorption & Permeability:**
+- `HIA_Hou`, `Caco2_Wang`, `PAMPA_NCATS`, `Bioavailability_Ma`
+
+**Metabolism (CYP):**
+- `CYP3A4_Substrate_CarbonMangels`, `CYP2D6_Substrate_CarbonMangels`, `CYP1A2_Veith`, etc.
+
+**Distribution:**
+- `BBB_Martins` (Blood-brain barrier), `PPBR_AZ`, `VDss_Lombardo`
+
+**Toxicity:**
+- `hERG` (Cardiac toxicity), `AMES` (Mutagenicity), `DILI` (Liver injury), `LD50_Zhu`
+
+**Physicochemical:**
+- `Solubility_AqSolDB`, `Lipophilicity_AstraZeneca`, `HydrationFreeEnergy_FreeSolv`
+
+See full list in `rlmollm/scoring/property_configs.py`.
+
+## Output
+
+The generator returns a pandas DataFrame with:
+- `smiles` - Generated molecule SMILES
+- Property columns (both normalized and `_raw` values)
+- `fitness` - Overall fitness score (harmonic mean of properties)
+
+CSV files are also saved to the output directory:
+- `final_population.csv` - Optimized molecules
+- `initial_population_properties.csv` - Starting molecules with properties
+- `run.log` - Optimization log
+
+## Testing
+
+Run the test suite:
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run specific test
+pytest tests/test_multi_property.py -v
+
+# Test ADMET optimization
+pytest tests/test_admet_opt.py -v
+
+# Test scaffold-based generation
+pytest tests/test_scaffold.py -v
+```
 
 ## Project Structure
 
 ```
-├── config/                     # Configuration files
-│   ├── scaffold_examples/      # Scaffold-specific configs
-│   └── no_scaffold_2_random.json  # Non-scaffold config
-├── models/                     # Neural network model definitions
-│   ├── rl/                     # Reinforcement learning models
-│   ├── generator.py            # Generator model architecture
-│   ├── discriminator.py        # Discriminator model architecture (not used)
-│   └── gan.py                  # GAN implementation (only generator used)
-├── analysis/                   # Analysis scripts and outputs
-│   ├── property_analysis_rl.py # Main analysis script
-│   ├── umap_plot.py           # UMAP visualization
-│   ├── plots/                 # Generated plots and visualizations
-│   └── logs/                  # Analysis logs
-├── scoring/                    # Molecular scoring functions
-│   ├── molecule_scoring.py     # Core scoring functions
-│   ├── admet_scoring.py       # Molecular scoring with ADMET features in development
-│   └── scoring_interface.py   # Scoring interface
-├── utils/                      # Utility functions
-│   ├── util.py                # Core utilities
-│   ├── training_utils.py      # Training helper functions
-│   └── sample_util.py         # Sampling utilities
-├── population/                 # Population management
-├── model_weights/             # Pre-trained model weights
-├── scaffold/                  # Scaffold-related functionality
-├── tokenizer/                 # Molecular tokenization
-├── data/                      # Data storage
-├── training_output/           # Training results and checkpoints
-├── inference_output/          # Generated molecules from inference
-├── scaffold_database/         # Scaffold database files
-├── api/                       # Web API components (optional)
-├── build_initial_population_*.sh  # Initial population generation
-├── train_all_*.sh            # Training scripts
-├── run_inference_*.sh        # Inference scripts
-├── run_property_analysis_*.sh # Analysis scripts
-├── training_combined.py       # Main training script
-├── inference.py              # Main inference script
-└── requirements.txt          # Python dependencies
+rlmollm/
+├── rlmollm/                   # Main package
+│   ├── generator.py           # Main API class
+│   ├── models/                # Neural network architectures
+│   ├── population/            # Population management
+│   ├── scoring/               # Property calculation
+│   │   ├── molecule_scoring.py
+│   │   ├── admet_scoring.py
+│   │   └── property_configs.py  # All property configurations
+│   ├── scaffold/              # Scaffold handling
+│   └── utils/                 # Utilities
+├── tests/                     # Test suite
+│   ├── conftest.py
+│   ├── test_multi_property.py
+│   ├── test_admet_opt.py
+│   └── test_scaffold.py
+├── config/                    # Configuration files
+│   ├── no_scaffold_2_moses.json
+│   ├── no_scaffold_2_zinc.json
+│   └── scaffold_examples/
+├── setup.py                   # Package installation
+└── requirements.txt           # Dependencies
 ```
 
-## Workflow Overview
+## Requirements
 
-The complete workflow consists of 4 main steps:
+- Python 3.11.11
+- PyTorch 2.4.0
+- Transformers 4.50.0
+- RDKit 2024.3.3
+- ADMET-AI 1.3.1
+- pandas, numpy, tqdm
 
-1. **Generate Initial Population** - Create starting molecules for training
-2. **Training** - Train molecular generation models
-3. **Inference** - Generate new molecules using trained models
-4. **Analysis** - Analyze and visualize results
+Full list in `requirements.txt`.
 
-Each step has two variants:
-- **Non-scaffold (`_ns_random`)**: Generates molecules without scaffold constraints (unconstrained)
-- **Scaffold-based (`_s`)**: Uses molecular scaffolds as constraints
+## Citation
 
-### Script Configuration
+If you use this code in your research, please cite:
 
-All shell scripts contain a **"CONFIGURABLE VARIABLES (Edit here)"** section where you can customize:
-
-- **Model Selection**: Choose which training methods to use via `CONFIG_KEYS` array
-- **Training Parameters**: Epochs, population size, mutation rates, etc.
-- **Output Directories**: Customize where results are saved
-- **Scaffold Selection**: For scaffold-based workflows
-
-**Available Model Types**:
-```bash
-CONFIG_KEYS=(
-    "alm_ppo"    # Adaptive Language Model (adaptive genetic algo) with PPO RL
-    "alm"        # Adaptive Language Model (adaptive genetic algo)
-    "lm_ppo"     # Language Model with PPO RL and genetic algo
-    "lm_ng_ppo"  # Language Model with PPO RL but no genetic algo
-    "lm"         # Language Model with genetic algo (no weight updates)
-    "lm_ng"      # Language Model with no genetic algo (no weight updates)
-)
+```bibtex
+@article{lin2025rlmollm,
+  title={RLMolLM: Reinforcement Learning-Enhanced Language Model Framework for Inverse Molecular Design},
+  author={Lin, Xiaobo and Bhowmik, Debsindhu and Kearney, Logan T and Naskar, Amit K},
+  journal={Journal of Chemical Information and Modeling},
+  volume={65},
+  number={22},
+  pages={12292--12304},
+  year={2025},
+  publisher={ACS Publications}
+}
+```
 ```
 
-**Note**: `lm`/`lm_ng` models have no weight updates during training - only maintained elite population differs.
+## License
 
-## Step 1: Generate Initial Population
+[Your License Here]
 
-Before training, you need to generate an initial population of molecules or use your own dataset.
+## Support
 
-### For Non-scaffold Generation (Unconstrained):
-```bash
-./build_initial_population_ns.sh
-```
-
-### For Scaffold-based Generation (Constrained):
-```bash
-./build_initial_population_s.sh
-```
-
-**Important**: 
-- These scripts automatically create a `2000_initial/` directory structure and save the generated `initial_population.csv` file there
-- The output will be organized as:
-  - **Non-scaffold**: `training_output/no_scaffold_2_random/2000_initial/initial_population.csv`
-  - **Scaffold-based**: `training_output/{scaffold_name}/2000_initial/initial_population.csv`
-
-**Customization**: 
-- Edit the scripts to modify population size, output directories, or scaffold configurations
-- You can also provide your own initial population CSV file with SMILES molecules in the same directory structure
-
-## Step 2: Training
-
-Train molecular generation models with various configurations.
-
-### For Non-scaffold Training (Unconstrained):
-```bash
-./train_all_ns_random.sh
-```
-
-This script trains models with different mutation parameters (1.0, 0.8, 0.7, 0.6, 0.5) and configurable training methods. You can select which models to train by editing the `CONFIG_KEYS` array in the script (same options as scaffold-based training above).
-
-**Customization**: Edit the configurable variables in the "CONFIGURABLE VARIABLES (Edit here)" section, including:
-- `CONFIG_KEYS`: Select which training methods to use
-- `MUTATION_RATES`: Adjust mutation parameters for exploration vs exploitation
-- Other training parameters like epochs, population size, etc.
-
-### For Scaffold-based Training (Constrained):
-```bash
-./train_all_s.sh
-```
-
-This script trains models for multiple scaffolds with different methods. You can configure which models to train by editing the `CONFIG_KEYS` array and other parameters in the "CONFIGURABLE VARIABLES (Edit here)" section of the script.
-
-
-## Step 3: Inference
-
-Generate new molecules using the trained models.
-
-### For Non-scaffold Inference (Unconstrained):
-```bash
-./run_inference_ns_random.sh
-```
-
-### For Scaffold-based Inference (Constrained):
-```bash
-./run_inference_s.sh
-```
-
-**Inference Parameters**:
-- Multiple validation modes:
-  - `valid_unique_only`: Only valid and unique molecules
-  - `valid_only`: Only valid molecules
-  - `no_validation`: Any generated molecules
-- Multiple repetitions for statistical analysis (4-8 samples per method)
-
-## Step 4: Analysis
-
-Analyze the generated molecules and create visualizations.
-
-### For Non-scaffold Analysis (Unconstrained):
-```bash
-./run_property_analysis_ns_random.sh
-```
-
-### For Scaffold-based Analysis (Constrained):
-```bash
-./run_property_analysis_s.sh
-```
-
-**Analysis Outputs**:
-- **Property distributions**: SA, QED, LogP, fitness.
-- **UMAP visualizations**: 2D projections of molecular chemical space
-- **Validity and uniqueness statistics**
-
-## Configuration
-
-### Non-scaffold Configuration (Unconstrained)
-- Configuration file: `config/no_scaffold_2_random.json`
-- Supports different mutation parameters for exploration vs exploitation
-
-### Scaffold Configuration (Constrained)
-- Available scaffolds: `scaffold_6_benzene`, `scaffold_7_dihydropyridine`, `scaffold_8_benzothiophene`
-- Configuration files in `config/scaffold_examples/`
-
-## Output Structure
-
-### Training Output
-```
-training_output/
-├── scaffold_6_benzene/
-│   ├── alm_ppo_2000_t1_e20/    # Trained models
-│   ├── alm_2000_t1_e20/
-│   └── ...
-└── no_scaffold_2_random/
-    ├── 1m/                      # Mutation parameter 1.0
-    │   ├── alm_ppo/
-    │   └── ...
-    └── 0p7m/                    # Mutation parameter 0.7
-```
-
-### Inference Output
-```
-inference_output/
-├── scaffold_6_benzene/
-│   ├── alm_ppo_valid_unique_only_1.csv
-│   ├── alm_ppo_valid_only_1.csv
-│   └── ...
-└── no_scaffold_2_random/
-    └── 1m/
-        ├── alm_ppo_valid_unique_only_1.csv
-        └── ...
-```
-
-## Technical Notes
-
-**No GAN Model Used**: While the codebase includes GAN components (generator and discriminator), no GAN training is performed due to mode collapse issues commonly encountered with GANs in molecular generation. The framework focuses on language model approaches with optional reinforcement learning enhancement.
+For issues and questions:
+- Open an issue on GitHub
+- Check existing issues for solutions
+- See test files for more usage examples

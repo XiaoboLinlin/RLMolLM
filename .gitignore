@@ -1,27 +1,90 @@
+# ==============================================================================
+# RLMOLLM - Library Usage .gitignore
+# ==============================================================================
+# This project is now used as a Python library (pip install -e .)
+# Users import rlmollm and use it programmatically (see examples/ and tests/)
+# Training scripts (.sh, training_combined.py, etc.) are development artifacts
+
+# ==============================================================================
 # Directories to exclude
+# ==============================================================================
 model_weights/
+model_weights*
+models/            # Downloaded models (use assets/models/ instead)
 play_try/
+datasets/
 training_output/
 training_output*/
 inference_output/
+inference_output_*
+test_output/
+test_output*/
+test_scaffold_check/
+test_scaffold_check_*/
 latex/
 inference/
 api/
 .vscode/
-analysis/plots/
-analysis/logs/
+analysis/           # Analysis scripts and plots (not part of library)
+manuscript_analysis/
+results/
+moved_folder/
+zarchive/
+download_script/   # Old download script with hardcoded token - DO NOT COMMIT
+initial_populations/  # Old location - moved to assets/initial_populations/
+examples/
+data/              # Not needed - RDKit has SA scoring built-in
+docs/
+config/            # Replaced by assets/configs/
+.cache/            # Hugging Face cache (downloaded models)
 
-# Project-specific files to exclude
+# Assets folder - track structure but exclude large files
+assets/models/*.pt          # Exclude model weights (too large for git)
+assets/initial_populations/*.csv  # Exclude initial populations (can be large)
+
+# Test outputs (keep only test scripts in tests/)
+tests/output/
+tests/test_output/
+tests/tests/
+tests/__pycache__/
+tests/*.md
+
+# ==============================================================================
+# Development/Training Scripts (not part of library usage)
+# ==============================================================================
+# Shell scripts for old training workflow
+*.sh
+
+# Old training/inference scripts (replaced by library API)
+training_combined.py
+inference.py
+train_*.py
+run_*.py
+build_*.py
+regenerate_*.py
+smiles_to_chars.py
+token_splits.py
+test_initial_population_feature.py
+setup.py
+
+# Project-specific development files
 extract_smiles.py
 note.txt
 check_validity.py
+cmd_example*.txt
+*.md
+!README.md
 
-# Docker-related files
+# ==============================================================================
+# Docker-related files (API deployment, not core library)
+# ==============================================================================
 Dockerfile*
 docker-compose*.yml
 nginx.conf
 
+# ==============================================================================
 # Python cache and temporary files
+# ==============================================================================
 __pycache__/
 *.pyc
 *.pyo
@@ -31,17 +94,25 @@ __pycache__/
 .pytest_cache/
 .coverage
 *.egg-info/
+dist/
+build/
 
+# ==============================================================================
 # Jupyter Notebook checkpoints
+# ==============================================================================
 .ipynb_checkpoints/
 
+# ==============================================================================
 # Environment files
+# ==============================================================================
 .env
 .venv
 env/
 venv/
 
+# ==============================================================================
 # OS generated files
+# ==============================================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -50,17 +121,32 @@ venv/
 ehthumbs.db
 Thumbs.db
 
+# ==============================================================================
 # IDE files
+# ==============================================================================
 *.swp
 *.swo
 *~
 
+# ==============================================================================
 # Log files
+# ==============================================================================
 *.log
 
+# ==============================================================================
 # Data files that might be large
+# ==============================================================================
 *.csv
 *.pkl
 *.pickle
 *.h5
-*.hdf5 
+*.hdf5
+*.pt              # PyTorch model files (too large for git)
+
+# ==============================================================================
+# Images and media
+# ==============================================================================
+*.png
+*.jpg
+*.jpeg
+*.gif 

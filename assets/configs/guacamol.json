@@ -1,0 +1,40 @@
+{
+    "gan_operators": [
+        {
+            "model_directory": "model_weights",
+            "saved_generator": "model_weights_guacamol/pretrain_0p6/latest_model_run_generator_0.pt",
+            "tokenizer_directory": "tokenizer",
+            "tokenizer_type": "bert",
+            "device": 0
+        }
+    ],
+    "scoring_operator": {
+        "scoring_names": [
+            "synth",
+            "drug",
+            "logP",
+            "number"
+        ],
+        "scoring_admet_names": [],
+
+        "selection_names": [
+            "synth",
+            "drug"
+        ],
+        
+        
+        "property_config": {
+            "synth": {"range": [0, 8], "higher_is_better": false},
+            "drug": {"range": [0, 1], "higher_is_better": true},
+            "logP": {"range": [-4, 7], "preferred_range": [1.35, 1.8]}
+        },
+
+        "data_column_name": "smiles",
+        "fitness_column_name": "fitness"
+    },
+
+    "no_scaffold_operator": {
+        "fixed_substructure": false,
+        "use_empirical": true
+    }
+}

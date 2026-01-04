@@ -191,7 +191,13 @@
             "range": [-3, 7],
             "preferred_range": [0, 5],
             "target_range": true,
-            "sigma": 1.0
+            "comment": "Use preferred_range for range targeting or preferred_value for single point targeting"
+        },
+        "logP_target_2.5": {
+            "description": "Predicted lipophilicity (logP) - target value 2.5",
+            "range": [-3, 7],
+            "preferred_value": 2.5,
+            "comment": "Example: Target specific value of 2.5 using linear distance-based scoring"
         },
         "tpsa": {
             "description": "Topological Polar Surface Area (TPSA)",
@@ -220,6 +226,12 @@
             "preferred_range": [0.5, 1],
             "higher_is_better": true,
             "sigma": 0.1
+        },
+        "QED_target_0.8": {
+            "description": "Quantitative Estimate of Drug-likeness (QED score) - target value 0.8",
+            "range": [0, 1],
+            "preferred_value": 0.8,
+            "comment": "Example: Target specific QED value of 0.8 using linear distance-based scoring"
         },
         "HydrationFreeEnergy_FreeSolv": {
             "description": "Hydration free energy from FreeSolv database",
