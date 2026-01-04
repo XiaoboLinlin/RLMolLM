@@ -1,4 +1,4 @@
-# RLMolLM: RL-Enhanced Language Model for Molecular Design
+# RLMolLM: Reinforcement Learning-Enhanced Language Model Framework for Inverse Molecular Design
 
 A Python library for AI-driven molecular generation and optimization using reinforcement learning. Generate drug-like molecules optimized for multiple properties simultaneously.
 
@@ -209,11 +209,6 @@ CSV files are also saved to the output directory:
 - `run.log` - Optimization log
 
 ## Testing
-
-Install test dependencies first:
-```bash
-pip install -e ".[test]"
-```
 
 Run the test suite:
 
