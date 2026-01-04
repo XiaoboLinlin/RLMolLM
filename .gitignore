@@ -35,10 +35,7 @@ initial_populations/  # Old location - moved to assets/initial_populations/
 examples/
 data/              # Not needed - RDKit has SA scoring built-in
 docs/
-
-# Old config files (replaced by assets/configs/)
-config/no_scaffold_2*.json
-config/admet_options/no_scaffold_2_moses_admet.json
+config/            # Old configs - replaced by assets/configs/ and rlmollm/scoring/property_configs.py
 .cache/            # Hugging Face cache (downloaded models)
 
 # Assets folder - track structure but exclude large files
