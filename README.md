@@ -210,6 +210,11 @@ CSV files are also saved to the output directory:
 
 ## Testing
 
+Install test dependencies first:
+```bash
+pip install -e ".[test]"
+```
+
 Run the test suite:
 
 ```bash
