@@ -206,15 +206,21 @@ def initialize_gan_operators(config, device, mutation_parameter_list, args):
         # Create a copy of operator_config to modify
         config_copy = operator_config.copy()
         
-        # Check if model_directory points to a .pt file
+        # Check if model_directory is invalid (not a local path or valid HF model)
+        # In this case, use tokenizer directory which has valid config.json
         model_dir = config_copy.get('model_directory', '')
-        if model_dir.endswith('.pt') and os.path.exists(model_dir):
+        if model_dir and not os.path.exists(model_dir):
+            # model_directory doesn't exist locally, might be invalid
+            # Check if there's a saved_generator (pretrained weights)
+            if config_copy.get('saved_generator'):
+                print(f"model_directory '{model_dir}' not found locally")
+                print("Using tokenizer directory for model structure...")
+                config_copy['model_directory'] = 'tokenizer'
+        elif model_dir.endswith('.pt') and os.path.exists(model_dir):
+            # Legacy case: model_directory points directly to a .pt file
             print(f"Detected .pt file in model_directory: {model_dir}")
-            print("Using base model with saved generator weights...")
-            
-            # Use tokenizer directory for model structure (has config.json)
+            print("Using tokenizer directory with saved generator weights...")
             config_copy['model_directory'] = 'tokenizer'
-            # Set the .pt file as saved_generator
             config_copy['saved_generator'] = model_dir
             
         gan_operators.append(
