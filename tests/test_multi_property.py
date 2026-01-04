@@ -5,6 +5,7 @@ import pandas as pd
 from rdkit import Chem
 import os
 import re
+from rlmollm.config import get_population_path
 
 @pytest.mark.parametrize("model_type", ["lm", "lm_ppo", "alm"])
 def test_multi_property_optimization_model_types(generator, model_type):
@@ -20,7 +21,7 @@ def test_multi_property_optimization_model_types(generator, model_type):
             'sa': 1.0         # Target SA score of 1.0 (easier to synthesize)
         },
         model_type=model_type,  # Test different model types
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",  # MLM needs initial population
+        initial_population_file=get_population_path("moses"),
         population_size=200,
         generations=5,
         output_dir=output_dir,  # Save output with proper structure
@@ -96,7 +97,7 @@ def test_multi_property_optimization(generator):
             'logp': 2.5,      # Target LogP of 2.5
             'sa': 1.0         # Target SA score of 1.0 (easier to synthesize)
         },
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",  # MLM needs initial population
+        initial_population_file=get_population_path("moses"),
         population_size=200,
         generations=5,
         output_dir=output_dir,  # Save output with proper structure
