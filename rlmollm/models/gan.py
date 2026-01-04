@@ -64,7 +64,7 @@ class Gan:
 
         # note: this will fail if it conflicts with generator_only
         if saved_discriminator != None:
-            self._disc.load_state_dict(torch.load(saved_discriminator))
+            self._disc.load_state_dict(torch.load(saved_discriminator), strict=False)
 
     @property
     def generator_only(self):
