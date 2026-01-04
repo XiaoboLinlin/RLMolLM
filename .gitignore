@@ -25,6 +25,7 @@ latex/
 inference/
 api/
 .vscode/
+.cursor/
 analysis/
 manuscript_analysis/
 results/
