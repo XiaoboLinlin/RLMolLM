@@ -8,6 +8,7 @@ This comprehensive test verifies:
 """
 
 import pytest
+from rlmollm.config import get_population_path
 import pandas as pd
 from rdkit import Chem
 import os
@@ -33,7 +34,7 @@ def test_auto_load_property_not_in_config(generator):
     
     molecules_df = generator.optimize(
         target_properties=target_properties,
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+        initial_population_file=get_population_path("moses"),
         population_size=1000,
         generations=3,
         output_dir=output_dir,

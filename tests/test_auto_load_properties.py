@@ -4,6 +4,7 @@ Test that ADMET properties from options_range.json can be used without manual co
 import os
 import pytest
 from rlmollm import RLMolLMGenerator
+from rlmollm.config import get_population_path
 
 
 def test_auto_load_admet_property(generator):
@@ -24,7 +25,7 @@ def test_auto_load_admet_property(generator):
     
     molecules_df = generator.optimize(
         target_properties=target_properties,
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+        initial_population_file=get_population_path("moses"),
         population_size=50,
         generations=2,
         output_dir=output_dir,
@@ -76,7 +77,7 @@ def test_multiple_auto_load_properties(generator):
     
     molecules_df = generator.optimize(
         target_properties=target_properties,
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+        initial_population_file=get_population_path("moses"),
         population_size=50,
         generations=2,
         output_dir=output_dir,
@@ -110,7 +111,7 @@ def test_mixed_config_and_auto_load(generator):
     
     molecules_df = generator.optimize(
         target_properties=target_properties,
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+        initial_population_file=get_population_path("moses"),
         population_size=50,
         generations=2,
         output_dir=output_dir,

@@ -3,12 +3,13 @@
 import pytest
 import pandas as pd
 from rdkit import Chem
+from rlmollm.config import get_population_path
 
 def test_list_output(generator):
     """Test default list output."""
     molecules = generator.optimize(
         target_properties={'qed': 1.0},
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+        initial_population_file=get_population_path("moses"),
         population_size=32,
         generations=2
     )
@@ -26,7 +27,7 @@ def test_dataframe_output(generator):
     """Test DataFrame output with return_dataframe=True."""
     df = generator.optimize(
         target_properties={'qed': 1.0, 'logp': 2.5},
-        initial_population_file="training_output_moses/no_scaffold_2_moses/2000_initial/initial_population.csv",
+        initial_population_file=get_population_path("moses"),
         population_size=32,
         generations=2,
         return_dataframe=True
